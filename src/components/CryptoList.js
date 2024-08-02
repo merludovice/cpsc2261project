@@ -10,20 +10,25 @@ function CryptoList({ searchTerm }) {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        axios.get('https://api.coingecko.com/api/v3/coins/markets', {
-            params: {
-                vs_currency: 'usd',
-                order: 'market_cap_desc',
-                per_page: 15,
-                page: 1,
-                sparkline: false,
+        const fetchCryptos = async () => {
+            try {
+                const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+                    params: {
+                        vs_currency: 'usd',
+                        order: 'market_cap_desc',
+                        per_page: 100,  // Fetch up to 100 cryptos for a broader search
+                        page: 1,
+                        sparkline: false,
+                    }
+                });
+                setCryptos(response.data);
+            } catch (err) {
+                console.error('Error fetching data: ', err);
+                setError('Failed to fetch data. Please try again later.');
             }
-        }).then(response => {
-            setCryptos(response.data);
-        }).catch(err => {
-            console.error('Error fetching data: ', err);
-            setError('Failed to fetch data. Please try again later.');
-        });
+        };
+
+        fetchCryptos();
     }, []);
 
     if (error) return <p>{error}</p>;
